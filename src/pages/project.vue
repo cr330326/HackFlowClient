@@ -45,7 +45,8 @@
 
 <script lang="ts">
 import { Subject } from 'rxjs';
-const flashProjectList = new Subject<null>();
+// 在这里定义并导出subject。指定约束为null
+export const flashProjectList = new Subject<null>();
 </script>
 
 <script lang="ts" setup>
@@ -67,11 +68,14 @@ const pageData = reactive({
 
 onMounted(async () => {
   console.log('project mounted');
+  // 在组件挂载的时候 通过调用next 方法来触发事件。签名值为null，所以这里传null
   flashProjectList.next(null);
 })
 
-flashProjectList
+// 获取列表订阅 flashProjectList subject，在flashProjectList 这个subject 产生事件时会发送请求
+const flashSubscribe =  flashProjectList
   .subscribe(async () => {
+     console.log('flashSubscrib subscribe start');
     const { data: { data } } = await getProjectList({ offset: pageData.tableData.pageNo, size: 10 });
     const count = Math.ceil(data.total / data.pageSize);
     data.total = count < 0 ? 1 : count
@@ -79,11 +83,16 @@ flashProjectList
   })
 
 
-openOrCloseCreateProjectDialog.subscribe(async status => {
+const openOrCloseCreateProjectDialogSub = openOrCloseCreateProjectDialog.subscribe(async status => {
   if (!status) {
     pageData.tableData.pageNo = 1;
     flashProjectList.next(null)
   }
+})
+
+onBeforeUnmount(() => {
+  flashSubscribe.unsubscribe()
+  openOrCloseCreateProjectDialogSub.unsubscribe()
 })
 
 
@@ -105,8 +114,8 @@ async function delProject(id: number) {
     negativeText: '取消',
     onPositiveClick: async () => {
       try {
-        const { data: { rsp_msg } } = await deleteProject({ id });
-        message.success(rsp_msg);
+        const { data: { respMsg } } = await deleteProject({ id });
+        message.success(respMsg);
         flashProjectList.next(null)
       } catch (error) {
         message.error(error)

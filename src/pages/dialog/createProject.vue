@@ -45,7 +45,7 @@ import { I_Create_Project } from '@/comm/entity';
 import { createProject } from '@/comm/request';
 import { createDiscreteApi } from 'naive-ui';
 import { reactive, ref } from 'vue';
-
+import { flashProjectList } from '@/pages/project.vue';
 
 const showModal = ref(false)
 
@@ -106,6 +106,8 @@ async function handCreateProject() {
     await createProject(formValue);
     message.success('创建项目成功!');
     openOrCloseCreateProjectDialog.next(false)
+    // 在子组件中导入 该subject，触发事件。
+    flashProjectList.next(null);
   } catch (error) {
     message.error(error)
   }
@@ -114,9 +116,11 @@ async function handCreateProject() {
 function handCancel() {
   drop()
   openOrCloseCreateProjectDialog.next(false)
+  //flashProjectList.next(null);
 }
 
 function drop() {
-  formValue.name = ''
+  //formValue.name = ''
 }
+
 </script>

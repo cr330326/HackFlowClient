@@ -51,7 +51,7 @@ export async function createProject(data: I_Create_Project) {
 }
 
 export async function deleteProject(data: Pick<I_Project, 'id'>) {
-  return await instance.delete<T_Basic_rsp<string>>('/project/delete_project', { data })
+  return await instance.delete<T_Basic_rsp<string>>('/v1/project/delete/'.concat(data.id.toString()) )
 }
 
 export async function getFlowList(data: T_flow_page_query) {
