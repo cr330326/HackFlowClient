@@ -54,6 +54,10 @@ export async function deleteProject(data: Pick<I_Project, 'id'>) {
   return await instance.delete<T_Basic_rsp<string>>('/v1/project/delete/'.concat(data.id.toString()) )
 }
 
+export async function getProjectDetail(data: { id: string }) {
+  return await instance.get<T_Basic_rsp<I_Project>>(`/v1/project/detail?id=${data.id}`);
+}
+
 export async function getFlowList(data: T_flow_page_query) {
   type rsp = T_Basic_rsp<T_Page_query_res<I_Flow>>
   return await instance.post<rsp>('/flow/get_flow_list', data)

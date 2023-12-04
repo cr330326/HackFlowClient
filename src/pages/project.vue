@@ -28,7 +28,7 @@
           <td>{{ ele.version }}</td>
           <td>
             <n-space>
-              <n-button type="primary" @click="checkFlow(ele.id)">查看项目</n-button>
+              <n-button type="primary" @click="editProject(ele.id)">查看项目</n-button>
               <n-button type="error" @click="delProject(ele.id)"> 删除项目</n-button>
             </n-space>
           </td>
@@ -56,6 +56,7 @@ import { createDiscreteApi } from 'naive-ui';
 import { onBeforeUnmount, onMounted, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import createProject, { openOrCloseCreateProjectDialog } from './dialog/createProject.vue';
+import { Flow_Status } from '@/comm';
 
 const router = useRouter();
 const pageData = reactive({
@@ -127,8 +128,9 @@ async function delProject(id: number) {
 
 }
 
-async function checkFlow(projectId: number) {
-  router.push({ name: 'flow', query: { projectId } })
+async function editProject(projectId: number) {
+  //router.push({ name: 'createFlow', query: { projectId } })
+  router.push({ name: 'createProject', query: { status: Flow_Status.EDIT, projectId: projectId } })
 }
 
 </script>

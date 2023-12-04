@@ -42,10 +42,16 @@ export const openOrCloseCreateProjectDialog = new Subject<boolean>();
 
 <script lang="ts" setup>
 import { I_Create_Project } from '@/comm/entity';
-import { createProject } from '@/comm/request';
-import { createDiscreteApi } from 'naive-ui';
-import { reactive, ref } from 'vue';
+import { createProject, getProjectDetail } from '@/comm/request';
+import { FormInst,createDiscreteApi } from 'naive-ui';
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import { flashProjectList } from '@/pages/project.vue';
+import { useRoute, useRouter } from 'vue-router';
+import { Flow_Status } from '@/comm';
+
+const formRef = ref<FormInst | null>(null)
+const query = useRoute().query as unknown as { projectId?: string, status: Flow_Status }
+const router = useRouter();
 
 const showModal = ref(false)
 
@@ -100,6 +106,35 @@ const rules = reactive({
   }
 })
 
+onMounted(async () => {
+  switch (+query.status) {
+    case Flow_Status.CREATE:
+      break;
+    case Flow_Status.EDIT:
+      await initFLowData();
+      break;
+    default:
+      break;
+  }
+})
+
+onBeforeUnmount(() => {
+
+})
+
+
+async function initFLowData() {
+  const { data: { data } } = await getProjectDetail({ id: query.projectId });
+  nextTick(() => {
+    formValue.projectName = data.name;
+    formValue.projectType = data.type;
+    formValue.startDate = data.startDate;
+    formValue.endDate = data.endDate;
+    formValue.thumbUrl = data.thumbUrl;
+    formValue.fileUrl = data.fileUrl;
+  })
+}
+
 async function handCreateProject() {
   const { message } = createDiscreteApi(['message']);
   try {
@@ -120,7 +155,7 @@ function handCancel() {
 }
 
 function drop() {
-  //formValue.name = ''
+  formValue.projectName = ''
 }
 
 </script>
