@@ -1,0 +1,122 @@
+<template>
+  <div>
+    <n-modal v-model:show="showModal" :auto-focus="true" :close-on-esc="true" :on-after-leave="drop">
+      <n-card style="width: 600px" title="创建项目" :bordered="false" size="huge" role="dialog" aria-modal="true">
+
+        <n-form ref="formRef" :label-width="80" :model="formValue" :rules="rules" size="medium">
+          <n-form-item label="项目名称" path="name">
+            <n-input v-model:value="formValue.projectName" placeholder="输入项目名称" />
+          </n-form-item>
+          <n-form-item label="类型" path="type">
+            <n-input v-model:value="formValue.projectType" placeholder="输入类型" />
+          </n-form-item>
+          <n-form-item label="开始日期" path="startDate">
+            <n-input v-model:value="formValue.startDate" placeholder="输入开始日期" />
+          </n-form-item>
+          <n-form-item label="结束日期" path="endDate">
+            <n-input v-model:value="formValue.endDate" placeholder="输入结束日期" />
+          </n-form-item>
+          <n-form-item label="图片地址" path="thumbUrl">
+            <n-input v-model:value="formValue.thumbUrl" placeholder="输入图片地址" />
+          </n-form-item>
+          <n-form-item label="资源地址" path="fileUrl">
+            <n-input v-model:value="formValue.fileUrl" placeholder="输入资源地址" />
+          </n-form-item>
+        </n-form>
+
+        <template #footer>
+          <n-space>
+            <n-button type="primary" @click="handCreateProject">确认</n-button>
+            <n-button type="error" @click="handCancel">取消</n-button>
+          </n-space>
+        </template>
+      </n-card>
+    </n-modal>
+  </div>
+</template>
+
+<script lang="ts">
+import { Subject } from 'rxjs'
+export const openOrCloseCreateProjectDialog = new Subject<boolean>();
+</script>
+
+<script lang="ts" setup>
+import { I_Create_Project } from '@/comm/entity';
+import { createProject } from '@/comm/request';
+import { createDiscreteApi } from 'naive-ui';
+import { reactive, ref } from 'vue';
+
+
+const showModal = ref(false)
+
+openOrCloseCreateProjectDialog.subscribe(modalStatus => {
+  showModal.value = modalStatus
+})
+
+const formValue = reactive<I_Create_Project>({
+  projectName: '',
+  projectCode: '008',
+  projectType: 1,
+  startDate: '',
+  endDate: '',
+  thumbUrl: '',
+  format: 1,
+  fileUrl: '',
+  fileMd5: '',
+  version: '1.0.0',
+  desc: ''
+})
+
+const rules = reactive({
+  name: {
+    required: true,
+    message: '请输入项目名称',
+    trigger: 'blur'
+  },
+  type: {
+    required: true,
+    message: '请输入类型',
+    trigger: 'blur'
+  },
+  startDate: {
+    required: true,
+    message: '请输入开始日期',
+    trigger: 'blur'
+  },
+  endDate: {
+    required: true,
+    message: '请输入结束日期',
+    trigger: 'blur'
+  },
+  thumbUrl: {
+    required: false,
+    message: '请输入图片地址',
+    trigger: 'blur'
+  },
+  fileUrl: {
+    required: true,
+    message: '请输入资源地址',
+    trigger: 'blur'
+  }
+})
+
+async function handCreateProject() {
+  const { message } = createDiscreteApi(['message']);
+  try {
+    await createProject(formValue);
+    message.success('创建项目成功!');
+    openOrCloseCreateProjectDialog.next(false)
+  } catch (error) {
+    message.error(error)
+  }
+}
+
+function handCancel() {
+  drop()
+  openOrCloseCreateProjectDialog.next(false)
+}
+
+function drop() {
+  formValue.name = ''
+}
+</script>
