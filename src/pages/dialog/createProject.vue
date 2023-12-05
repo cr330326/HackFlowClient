@@ -117,7 +117,7 @@ onBeforeUnmount(() => {
 
 
 async function initFLowData(id:number) {
-  if(!id)return;
+  if(!id) return;
   const { data: { data } } = await getProjectDetail({ id });
   formValue.projectName = data.name;
   formValue.projectType = data.type;
@@ -144,7 +144,6 @@ async function handCreateProject() {
 function handCancel() {
   drop()
   openOrCloseCreateProjectDialog.next({statu:false, id:-1})
-  // flashProjectList.next(null);
 }
 
 function drop() {

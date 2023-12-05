@@ -84,7 +84,6 @@ const flashSubscribe =  flashProjectList
       pageData.tableData = data;
      } catch (error) {
       console.error(error);
-
      }
   })
 
@@ -134,7 +133,7 @@ async function delProject(id: number) {
 }
 
 async function editProject(projectId: number) {
-   openOrCloseCreateProjectDialog.next({ statu: true, id: projectId })
+  openOrCloseCreateProjectDialog.next({ statu: true, id: projectId })
 }
 
 </script>
