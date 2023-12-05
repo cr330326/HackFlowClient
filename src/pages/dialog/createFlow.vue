@@ -52,7 +52,7 @@ async function handCreateProject() {
   const { message } = createDiscreteApi(['message']);
   try {
     await createProject(formValue);
-    message.success('创建项目成功!');
+    message.success('项目创建成功!');
     openOrCloseCreateProjectDialog.next(false)
   } catch (error) {
     message.error(error)

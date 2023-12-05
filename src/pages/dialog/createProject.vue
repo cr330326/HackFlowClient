@@ -51,7 +51,7 @@ const formRef = ref<FormInst | null>(null)
 const showModal = ref(false)
 const isCreate = ref(false);
 
-openOrCloseCreateProjectDialog.subscribe(async modalStatus => {
+const openOrCloseCreateProjectDialogConst = openOrCloseCreateProjectDialog.subscribe(async modalStatus => {
   showModal.value = modalStatus.statu
   console.log(modalStatus);
   if (modalStatus.id > 0){
@@ -112,7 +112,7 @@ const rules = reactive({
 
 
 onBeforeUnmount(() => {
-
+  openOrCloseCreateProjectDialogConst.unsubscribe();
 })
 
 
@@ -132,9 +132,9 @@ async function handCreateProject() {
     const { message } = createDiscreteApi(['message']);
     try {
       await createProject(formValue);
-      message.success('创建项目成功!');
+      message.success('项目创建成功!');
+      openOrCloseCreateProjectDialog.next({ statu: false, id: -1 })
       flashProjectList.next(null);
-      showModal.value = false;
     } catch (error) {
       message.error(error)
     }

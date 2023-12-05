@@ -35,7 +35,7 @@
         </tr>
       </tbody>
     </n-table>
-    <n-pagination v-model:page="pageData.tableData.pageNo" :page-count="pageData.tableData.total"
+    <n-pagination v-model:page="pageNewNo" :page-count="pageData.tableData.total"
       :on-update:page="pageUpdate" />
 
     <createProject :project-id="projectID"/>
@@ -56,6 +56,8 @@ import { createDiscreteApi } from 'naive-ui';
 import { onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import createProject, { openOrCloseCreateProjectDialog } from './dialog/createProject.vue';
 
+const pageNewNo = ref(1);
+
 const pageData = reactive({
   tableData: {
     total: 0,
@@ -66,7 +68,6 @@ const pageData = reactive({
 const projectID = ref(null);
 
 onMounted(async () => {
-  console.log('project mounted');
   // 在组件挂载的时候 通过调用next 方法来触发事件。签名值为null，所以这里传null
   flashProjectList.next(null);
 })
@@ -76,8 +77,10 @@ const flashSubscribe =  flashProjectList
   .subscribe(async () => {
      try {
       console.log('flashSubscrib subscribe start');
+      console.log('flashSubscrib pageNo', pageData.tableData.pageNo);
+
       const offset = pageData.tableData.pageNo - 1 < 0 ? 0 : pageData.tableData.pageNo - 1;
-      const { data: { data } } = await getProjectList({ offset , size: 10 });
+      const { data: { data } } = await getProjectList({ offset , size: 100 });
       console.log(data)
       const count = Math.ceil(data.total / data.pageSize);
       data.total = count < 0 ? 0 : count
@@ -88,9 +91,11 @@ const flashSubscribe =  flashProjectList
   })
 
 const openOrCloseCreateProjectDialogSub = openOrCloseCreateProjectDialog.subscribe(async status => {
+  console.log(status);
   if (!status) {
+    pageNewNo.value = 1;
     pageData.tableData.pageNo = 1;
-    if(!status.id) return;
+    //if(!status.id) return;
     flashProjectList.next(null)
   }
 })
@@ -106,7 +111,8 @@ function onCarateProject() {
 
 async function pageUpdate(page: number) {
   console.log(page)
-  pageData.tableData.pageNo = (page);
+  pageNewNo.value = page;
+  pageData.tableData.pageNo = page;
   flashProjectList.next(null)
 }
 
@@ -120,7 +126,7 @@ async function delProject(id: number) {
     onPositiveClick: async () => {
       try {
         const { data: { respMsg } } = await deleteProject({ id });
-        message.success(respMsg);
+        message.success("删除成功!");
         flashProjectList.next(null)
       } catch (error) {
         message.error(error)
