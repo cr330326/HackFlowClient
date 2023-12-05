@@ -38,7 +38,7 @@
     <n-pagination v-model:page="pageData.tableData.pageNo" :page-count="pageData.tableData.total"
       :on-update:page="pageUpdate" />
 
-    <createProject />
+    <createProject :project-id="projectID"/>
 
   </n-space>
 </template>
@@ -50,22 +50,20 @@ export const flashProjectList = new Subject<null>();
 </script>
 
 <script lang="ts" setup>
-import { I_Project, I_Create_Project } from '@/comm/entity';
+import { I_Project } from '@/comm/entity';
 import { T_Page_query_res, deleteProject, getProjectList } from '@/comm/request';
 import { createDiscreteApi } from 'naive-ui';
-import { onBeforeUnmount, onMounted, reactive } from 'vue';
-import { useRouter } from 'vue-router';
+import { onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import createProject, { openOrCloseCreateProjectDialog } from './dialog/createProject.vue';
-import { Flow_Status } from '@/comm';
 
-const router = useRouter();
 const pageData = reactive({
   tableData: {
     total: 0,
-    pageNo: 0
+    pageNo: 1
   } as T_Page_query_res<I_Project>,
 })
 
+const projectID = ref(null);
 
 onMounted(async () => {
   console.log('project mounted');
@@ -76,17 +74,24 @@ onMounted(async () => {
 // 获取列表订阅 flashProjectList subject，在flashProjectList 这个subject 产生事件时会发送请求
 const flashSubscribe =  flashProjectList
   .subscribe(async () => {
-     console.log('flashSubscrib subscribe start');
-    const { data: { data } } = await getProjectList({ offset: pageData.tableData.pageNo, size: 10 });
-    const count = Math.ceil(data.total / data.pageSize);
-    data.total = count < 0 ? 1 : count
-    pageData.tableData = data;
-  })
+     try {
+      console.log('flashSubscrib subscribe start');
+      const offset = pageData.tableData.pageNo - 1 < 0 ? 0 : pageData.tableData.pageNo - 1;
+      const { data: { data } } = await getProjectList({ offset , size: 10 });
+      console.log(data)
+      const count = Math.ceil(data.total / data.pageSize);
+      data.total = count < 0 ? 0 : count
+      pageData.tableData = data;
+     } catch (error) {
+      console.error(error);
 
+     }
+  })
 
 const openOrCloseCreateProjectDialogSub = openOrCloseCreateProjectDialog.subscribe(async status => {
   if (!status) {
     pageData.tableData.pageNo = 1;
+    if(!status.id) return;
     flashProjectList.next(null)
   }
 })
@@ -96,13 +101,13 @@ onBeforeUnmount(() => {
   openOrCloseCreateProjectDialogSub.unsubscribe()
 })
 
-
 function onCarateProject() {
-  openOrCloseCreateProjectDialog.next(true)
+  openOrCloseCreateProjectDialog.next({ statu: true, id: -1 })
 }
 
 async function pageUpdate(page: number) {
-  pageData.tableData.pageNo = page;
+  console.log(page)
+  pageData.tableData.pageNo = (page);
   flashProjectList.next(null)
 }
 
@@ -129,8 +134,7 @@ async function delProject(id: number) {
 }
 
 async function editProject(projectId: number) {
-  //router.push({ name: 'createFlow', query: { projectId } })
-  router.push({ name: 'createProject', query: { status: Flow_Status.EDIT, projectId: projectId } })
+   openOrCloseCreateProjectDialog.next({ statu: true, id: projectId })
 }
 
 </script>
