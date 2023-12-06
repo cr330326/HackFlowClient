@@ -3,19 +3,24 @@ import { createRouter, createWebHashHistory } from 'vue-router';
 const route = createRouter({
   routes: [
     {
-      path: "/project",
-      name: "project",
-      component: () => import('./pages/project.vue'),
-    },
-    {
-      path: "/flow",
-      name: "flow",
-      component: () => import('./pages/flow.vue')
-    },
-    {
-      path: "/login",
-      name: "login",
+      path: "/",
       component: () => import('./pages/login.vue')
+    },
+    {
+      path: "/app",
+      component: () => import('./App.vue'),
+      children: [
+        {
+          path: "project",
+          name: "project",
+          component: () => import('./pages/project.vue'),
+        },
+        {
+          path: "flow",
+          name: "flow",
+          component: () => import('./pages/flow.vue')
+        },
+      ]
     }
   ],
   history: createWebHashHistory()

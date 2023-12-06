@@ -27,12 +27,5 @@
 
 <script setup lang="ts">
 import { NMessageProvider, NDialogProvider } from 'naive-ui'
-import { onMounted } from 'vue';
-import { useRouter } from 'vue-router';
 import { menuOptions } from './comm/menus';
-
-
-onMounted(() => {
-  useRouter().replace({name: 'login'})
-})
 </script>

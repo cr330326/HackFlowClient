@@ -1,7 +1,8 @@
 import "normalize.css"
 import { createApp } from 'vue';
-import App from './App.vue';
 import route from "./router";
+
+import baseVue from "./base.vue";
 
 import naive from 'naive-ui'
 // 通用字体
@@ -9,7 +10,7 @@ import 'vfonts/Lato.css'
 // 等宽字体
 import 'vfonts/FiraCode.css'
 
-createApp(App)
+createApp(baseVue)
   .use(naive)
   .use(route)
   .mount('#app');
