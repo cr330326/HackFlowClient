@@ -11,6 +11,11 @@ const route = createRouter({
       path: "/flow",
       name: "flow",
       component: () => import('./pages/flow.vue')
+    },
+    {
+      path: "/login",
+      name: "login",
+      component: () => import('./pages/login.vue')
     }
   ],
   history: createWebHashHistory()
