@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 import { I_Create_Project, I_Flow, I_Project } from './entity';
 
 const instance = axios.create({
-  baseURL: "http://124.71.149.122:8080/hack/api",
+  baseURL: "http://127.0.0.1:40001/hack/api",
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json;charset=utf-8'
